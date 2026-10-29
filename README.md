@@ -4,6 +4,14 @@
 
 Free from **@thoseaiguys** 🎁
 
+### 👉 Open Claude Code and paste this:
+
+```
+Install the Yap Editor from https://github.com/EnergySteve/yap-editor into ~/.claude/skills/yap-editor, run its setup.sh, then show me how to use it.
+```
+
+Then drop in any video and say **"yap this"**. That's it.
+
 > 🔥 **Want AI to run your marketing, not just your edits?** Work with **Benza** live in the **AI Marketing Sprint**. Seats are limited. **[Join now →](https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-top)**
 >
 > 💬 **Questions?** Reply to any of Benza's emails, or write to **benza@benzamaman.com**. Ask anything.
