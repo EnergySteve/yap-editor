@@ -45,3 +45,6 @@ echo "ok"
 
 printf "\n\033[1;32mAll set.\033[0m Try it:\n\n  python3 yap.py cut /path/to/your-video.mov\n\n"
 echo "(The first video downloads the speech models, about 1 GB, one time only.)"
+echo
+echo "🔥 Work with Benza live in the AI Marketing Sprint (limited seats): https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-setup"
+echo "💬 Any questions? Reply to Benza's email or write to benza@benzamaman.com"

@@ -4,6 +4,10 @@
 
 Free from **@thoseaiguys** 🎁
 
+> 🔥 **Want AI to run your marketing, not just your edits?** Work with **Benza** live in the **AI Marketing Sprint**. Seats are limited. **[Join now →](https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-top)**
+>
+> 💬 **Questions?** Reply to any of Benza's emails, or write to **benza@benzamaman.com**. Ask anything.
+
 ![The Yap Editor](docs/editor.png)
 
 ```
@@ -75,6 +79,8 @@ Claude listens to your video (about 1 minute per minute of video) and opens the 
 
 Everything lands in a folder next to your video called `your-video-yap/`.
 
+> 🚀 **Made your first video?** This is one small piece of what Claude can do for your marketing. Build the rest with **Benza live** in the AI Marketing Sprint. **[Grab a seat →](https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-use)**
+
 ---
 
 ## 💡 Tips for the best cut
@@ -107,9 +113,20 @@ python3 yap.py captions my-video-yap --headline "Hook here"  # captions + headli
 | The first video is slow | It's downloading the speech models (about 1 GB). Only the first time. |
 | "didn't hear any talking" | This is for talking videos, not music or b-roll |
 | The editor won't open | Go to **http://localhost:8765** in your browser |
+| Anything else | **Reply to Benza's email** or write to **benza@benzamaman.com**. Any and all questions! |
 
 ---
 
 Built with [WhisperX](https://github.com/m-bain/whisperX), [ffmpeg](https://ffmpeg.org) and [HyperFrames](https://github.com/heygen-com/hyperframes).
+
+## 🔥 Work with Benza live
+
+The Yap Editor is a free taste. In the **AI Marketing Sprint**, Benza works with you live so AI runs your whole marketing: content, emails, ads and follow-up.
+
+**Seats are limited. [Join the Sprint →](https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-bottom)**
+
+💬 Questions about the Yap Editor or the Sprint? **Reply to Benza** at **benza@benzamaman.com**. Any and all questions are welcome.
+
+---
 
 Made with ⚡ by **@thoseaiguys**, a free gift for everyone in the Claude Content & Marketing Masterclass with Benza.

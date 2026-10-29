@@ -17,6 +17,9 @@ HF = "hyperframes@0.8.140"
 FILLERS = {"um", "uh", "umm", "uhh", "erm", "er", "ah", "hmm", "mm", "mhm"}
 PAD_IN, PAD_OUT, JOIN = 0.10, 0.22, 0.22   # seconds kept before / after each word; gaps shorter than JOIN stay
 # Whisper tends to tidy up speech. This prompt nudges it to write down the ums, uhs and stutters so they can be cut.
+BENZA = ("\n  🔥 Want AI to run your whole marketing? Work with Benza live in the AI Marketing Sprint (limited seats):\n"
+         "     https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-cli\n"
+         "  💬 Any questions? Reply to Benza's email or write to benza@benzamaman.com\n")
 VERBATIM = "Umm, so, uh, I- I mean, like, you know, I was, uh, thinking... Um, okay."
 
 
@@ -200,6 +203,8 @@ def render(proj, log=print):
         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart", out])
     before, after = m["dur"], sum(b - a for a, b in segs)
     log(f"done: {before:.1f}s -> {after:.1f}s  ({out})")
+    if log is print:
+        print(BENZA)
     return out
 
 
@@ -270,6 +275,8 @@ def captions(proj, headline="", log=print):
     log("HyperFrames is drawing the captions (takes a minute or two) ...")
     sh(["npx", "--yes", HF, "render", "-o", out, "--quiet", "--fps", m["fps_str"], "--crf", "20"], cwd=hf)
     log(f"done: {out}")
+    if log is print:
+        print(BENZA)
     return out
 
 
