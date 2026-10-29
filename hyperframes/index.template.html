@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-resolution="{{RES}}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width={{W}}, height={{H}}" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* Yap Editor captions: your cut full screen, a headline on top, word-by-word captions low on the screen.
+         Every caption time is a word WhisperX heard. Text always sits on a solid fill so it reads on any footage. */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: {{W}}px; height: {{H}}px; overflow: hidden; background: #000; }
+      #root { position: relative; width: {{W}}px; height: {{H}}px; overflow: hidden; font-family: Inter, -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; }
+      .clip { position: absolute; inset: 0; width: {{W}}px; height: {{H}}px; }
+      video.full { position: absolute; left: 0; top: 0; width: {{W}}px; height: {{H}}px; object-fit: cover; }
+      .cap { position: absolute; left: 0; top: {{CAPTOP}}px; width: {{W}}px; text-align: center; opacity: 0; }
+      .cap span { display: inline-block; max-width: 92%; padding: 14px 30px; border-radius: 24px; background: rgba(12, 12, 14, 0.82); color: #fff; font-size: {{FS}}px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.15; }
+      .cap i { font-style: normal; }
+      .head { position: absolute; left: 0; top: {{HEADTOP}}px; width: {{W}}px; text-align: center; }
+      .head span { display: inline-block; max-width: 90%; padding: 18px 34px; border-radius: 22px; background: #FFD43B; color: #111; font-size: {{HFS}}px; font-weight: 900; line-height: 1.1; text-transform: uppercase; letter-spacing: -0.5px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{DUR}}" data-width="{{W}}" data-height="{{H}}">
+      <video class="full" id="cut" src="assets/cut.mp4" muted playsinline data-start="0" data-duration="{{DUR}}" data-track-index="1"></video>
+      <audio id="snd" src="assets/cut.wav" data-start="0" data-duration="{{DUR}}" data-track-index="9" data-volume="1"></audio>
+{{HEAD}}
+      <div id="caps" class="clip" data-start="0" data-duration="{{DUR}}" data-track-index="4">
+{{CAPS}}
+      </div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo(".head span", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.6)" }, 0.05);
+      {{CAPSJS}}
+      tl.set({}, {}, {{DUR}});
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

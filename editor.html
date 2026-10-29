@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yap Editor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+<style>
+  :root { --bg:#141416; --panel:#1f1f23; --line:#2e2e35; --ink:#f4f2ee; --dim:#8d8a95; --gold:#E6C875; --purple:#7E4BC9; --red:#ff5c6c; --orange:#ffa94d; --green:#3ddc97; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system, "SF Pro Text", Inter, Arial, sans-serif; height:100vh; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:18px; padding:14px 22px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .logo { font-weight:900; font-size:20px; letter-spacing:.5px; }
+  .logo b { color:var(--gold); }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:6px 14px; font-variant-numeric:tabular-nums; }
+  .stat b { font-size:18px; }
+  .stat .arrow { color:var(--gold); margin:0 6px; }
+  .grow { flex:1; }
+  button { font:inherit; font-weight:700; border:0; border-radius:12px; padding:10px 18px; cursor:pointer; color:#141416; background:var(--gold); }
+  button.ghost { background:var(--panel); color:var(--ink); border:1px solid var(--line); }
+  button.purple { background:var(--purple); color:#fff; }
+  button:disabled { opacity:.45; cursor:default; }
+  main { flex:1; display:flex; min-height:0; }
+  .left { width:42%; min-width:320px; padding:20px; display:flex; flex-direction:column; gap:14px; border-right:1px solid var(--line); }
+  video { width:100%; flex:1; min-height:0; background:#000; border-radius:16px; object-fit:contain; }
+  .bar { position:relative; height:34px; background:#2a1a1e; border-radius:8px; overflow:hidden; cursor:pointer; }
+  .bar i { position:absolute; top:0; bottom:0; background:linear-gradient(180deg, #f0d88f, #c9a94f); }
+  .bar .ph { position:absolute; top:-2px; bottom:-2px; width:3px; background:#fff; box-shadow:0 0 8px #fff; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .toggle { display:flex; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .toggle button { border-radius:0; background:transparent; color:var(--dim); padding:8px 14px; }
+  .toggle button.on { background:var(--gold); color:#141416; }
+  .right { flex:1; overflow-y:auto; padding:22px 28px 80px; }
+  .help { color:var(--dim); margin-bottom:16px; display:flex; gap:18px; flex-wrap:wrap; }
+  .key { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+  .line { display:flex; gap:14px; padding:8px 0; border-bottom:1px solid #222227; }
+  .t { width:52px; flex:none; color:var(--dim); font-variant-numeric:tabular-nums; cursor:pointer; padding-top:4px; font-size:13px; }
+  .t:hover { color:var(--gold); }
+  .words { font-size:19px; line-height:2; }
+  .w { padding:3px 5px; border-radius:7px; cursor:pointer; transition:background .1s; }
+  .w:hover { background:#34343c; }
+  .w.cut { text-decoration:line-through; text-decoration-thickness:2px; opacity:.55; }
+  .w.cut.retake { color:var(--red); background:rgba(255,92,108,.10); }
+  .w.cut.filler { color:var(--orange); background:rgba(255,169,77,.10); }
+  .w.cut.repeat { color:#ff8fa3; background:rgba(255,92,108,.10); }
+  .w.cut.you { color:var(--dim); background:rgba(141,138,149,.12); }
+  .w.now { outline:2px solid var(--gold); background:rgba(230,200,117,.18); }
+  .w.cut.now { outline-color:var(--red); }
+  .toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 20px; font-weight:600; display:none; max-width:90vw; }
+  .toast a { color:var(--gold); margin-left:10px; }
+  input { font:inherit; background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:12px; padding:9px 14px; flex:1; min-width:180px; }
+  @media (max-width: 820px) { main { flex-direction:column; } .left { width:100%; border-right:0; border-bottom:1px solid var(--line); height:55vh; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">YAP <b>EDITOR</b></div>
+  <div class="stat"><span id="before">0:00</span><span class="arrow">→</span><b id="after">0:00</b></div>
+  <div class="stat"><b id="ncut">0</b> cuts</div>
+  <div class="grow"></div>
+  <button class="ghost" id="undo" title="Undo (Cmd+Z)">↶ Undo</button>
+  <button id="renderBtn">Render the cut</button>
+</header>
+<main>
+  <section class="left">
+    <video id="v" src="/source" preload="auto"></video>
+    <div class="bar" id="bar"><div class="ph" id="ph"></div></div>
+    <div class="row">
+      <button class="ghost" id="play">▶ Play</button>
+      <div class="toggle"><button class="on" id="mCut">Preview the cut</button><button id="mRaw">Original</button></div>
+      <span style="color:var(--dim)">Space = play / pause</span>
+    </div>
+    <div class="row">
+      <input id="headline" placeholder="Headline on top (optional)">
+      <button class="purple" id="capsBtn">Add captions</button>
+    </div>
+  </section>
+  <section class="right">
+    <div class="help">
+      <span>Click a word to cut it or bring it back. Click the time to jump there.</span>
+      <span><i class="key" style="background:var(--red)"></i>retake</span>
+      <span><i class="key" style="background:var(--orange)"></i>um / uh</span>
+      <span><i class="key" style="background:#ff8fa3"></i>repeat</span>
+      <span><i class="key" style="background:var(--dim)"></i>you cut it</span>
+    </div>
+    <div id="script"></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const v = document.getElementById("v"), $ = id => document.getElementById(id);
+let E, W, segs = [], undoStack = [], mode = "cut";
+const PAD_IN = 0.10, PAD_OUT = 0.22, JOIN = 0.22;   // keep in sync with yap.py
+const fmt = s => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+
+function build() {
+  segs = [];
+  // same rule as yap.py: a cut word always splits the range, padding never reaches into it
+  W.forEach((w, i) => {
+    if (!w.keep) return;
+    const prevCut = i > 0 && !W[i - 1].keep, nextCut = i + 1 < W.length && !W[i + 1].keep;
+    const a = Math.max(0, w.a - PAD_IN, prevCut ? W[i - 1].b : 0);
+    const b = Math.min(E.meta.dur, w.b + PAD_OUT, nextCut ? W[i + 1].a : E.meta.dur);
+    if (segs.length && !prevCut && a - segs[segs.length - 1][1] < JOIN) segs[segs.length - 1][1] = Math.max(segs[segs.length - 1][1], b);
+    else segs.push([a, Math.max(a, b)]);
+  });
+  const after = segs.reduce((t, s) => t + s[1] - s[0], 0);
+  $("before").textContent = fmt(E.meta.dur); $("after").textContent = fmt(after);
+  $("ncut").textContent = W.filter(w => !w.keep).length;
+  const bar = $("bar"); bar.querySelectorAll("i").forEach(x => x.remove());
+  for (const [a, b] of segs) { const i = document.createElement("i"); i.style.left = (a / E.meta.dur * 100) + "%"; i.style.width = ((b - a) / E.meta.dur * 100) + "%"; bar.insertBefore(i, $("ph")); }
+}
+
+function paint() {
+  const el = $("script"); el.innerHTML = "";
+  let line = null, words = null;
+  W.forEach((w, i) => {
+    const prev = W[i - 1];
+    if (!prev || /[.?!]$/.test(prev.w) || w.a - prev.b > 0.55) {
+      line = document.createElement("div"); line.className = "line";
+      const t = document.createElement("div"); t.className = "t"; t.textContent = fmt(w.a); t.onclick = () => seek(w.a);
+      words = document.createElement("div"); words.className = "words";
+      line.append(t, words); el.append(line);
+    }
+    const s = document.createElement("span"); s.className = "w"; s.id = "w" + i; s.textContent = w.w;
+    s.onclick = () => toggle(i); words.append(s, " ");
+    style(i);
+  });
+}
+function style(i) { const w = W[i], s = $("w" + i); s.className = "w" + (w.keep ? "" : " cut " + (w.why || "you")); }
+function toggle(i) {
+  undoStack.push(W.map(w => [w.keep, w.why]));
+  W[i].keep = !W[i].keep; if (!W[i].keep && !W[i].why) W[i].why = "you";
+  style(i); build(); save();
+}
+$("undo").onclick = () => { const h = undoStack.pop(); if (!h) return; h.forEach(([k, y], i) => { W[i].keep = k; W[i].why = y; style(i); }); build(); save(); };
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.code === "Space") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === "z") { e.preventDefault(); $("undo").click(); }
+});
+let saveT; function save() { clearTimeout(saveT); saveT = setTimeout(() => fetch("/save", { method: "POST", body: JSON.stringify({ keep: W.map(w => w.keep) }) }), 300); }
+
+function seek(t) { v.currentTime = t; }
+$("bar").onclick = e => { const r = e.currentTarget.getBoundingClientRect(); seek((e.clientX - r.left) / r.width * E.meta.dur); };
+$("play").onclick = () => v.paused ? v.play() : v.pause();
+v.onplay = () => $("play").textContent = "❚❚ Pause"; v.onpause = () => $("play").textContent = "▶ Play";
+$("mCut").onclick = () => { mode = "cut"; $("mCut").classList.add("on"); $("mRaw").classList.remove("on"); };
+$("mRaw").onclick = () => { mode = "raw"; $("mRaw").classList.add("on"); $("mCut").classList.remove("on"); };
+
+// in "Preview the cut", jump over cut parts. Looks one frame ahead so short cuts don't leak through.
+const AHEAD = 0.035;
+function skip() {
+  if (mode !== "cut" || v.paused || v.seeking || !segs.length) return;
+  const t = v.currentTime;
+  if (segs.some(([a, b]) => t >= a - 0.01 && t < b - AHEAD)) return;
+  const next = segs.find(([a]) => a > t + 0.005);
+  if (next) v.currentTime = next[0]; else v.pause();
+}
+if (v.requestVideoFrameCallback) { const f = () => { skip(); v.requestVideoFrameCallback(f); }; v.requestVideoFrameCallback(f); }
+v.addEventListener("play", () => { if (mode === "cut" && segs.length && !segs.some(([a, b]) => v.currentTime >= a - 0.01 && v.currentTime < b)) skip(); });
+
+let lastNow = -1;
+function tick() {
+  const t = v.currentTime;
+  skip();
+  $("ph").style.left = (t / E.meta.dur * 100) + "%";
+  const now = W.findIndex(w => t >= w.a && t < w.b + 0.05);
+  if (now !== lastNow) {
+    if (lastNow >= 0) $("w" + lastNow).classList.remove("now");
+    if (now >= 0) { const s = $("w" + now); s.classList.add("now"); if (!v.paused) s.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    lastNow = now;
+  }
+  requestAnimationFrame(tick);
+}
+
+function toast(html, keep) { const t = $("toast"); t.innerHTML = html; t.style.display = "block"; if (!keep) setTimeout(() => t.style.display = "none", 3500); }
+async function job(path, body) {
+  $("renderBtn").disabled = $("capsBtn").disabled = true;
+  await fetch(path, { method: "POST", body: JSON.stringify(body || {}) });
+  const poll = setInterval(async () => {
+    const s = await (await fetch("/status")).json();
+    toast(s.msg + (s.file ? ` <a href="${s.file}" target="_blank">open the video</a>` : ""), true);
+    if (!s.busy) { clearInterval(poll); $("renderBtn").disabled = $("capsBtn").disabled = false; }
+  }, 1000);
+}
+$("renderBtn").onclick = () => job("/render");
+$("capsBtn").onclick = () => job("/captions", { headline: $("headline").value });
+
+fetch("/edit.json").then(r => r.json()).then(d => { E = d; W = d.words; paint(); build(); requestAnimationFrame(tick);
+  // open on the first kept word (or ?t=seconds)
+  const at = parseFloat(new URLSearchParams(location.search).get("t"));
+  if (segs.length) v.addEventListener("loadedmetadata", () => { if (v.currentTime === 0) v.currentTime = isNaN(at) ? segs[0][0] : at; }, { once: true }); });
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+.venv/
+*-yap/
+node_modules/
+.playwright-mcp/
+.DS_Store
+__pycache__/
