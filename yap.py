@@ -19,6 +19,7 @@ PAD_IN, PAD_OUT, JOIN = 0.10, 0.22, 0.22   # seconds kept before / after each wo
 # Whisper tends to tidy up speech. This prompt nudges it to write down the ums, uhs and stutters so they can be cut.
 BENZA = ("\n  🔥 Want AI to run your whole marketing? Work with Benza live in the AI Marketing Sprint (limited seats):\n"
          "     https://sprint.benzamaman.com/?utm_source=github&utm_medium=owned&utm_campaign=sprint-close&utm_content=yap-editor-cli\n"
+         "  🤝 Want it done for you? Hire Benza: benza@benzamaman.com\n"
          "  💬 Any questions? Reply to Benza's email or write to benza@benzamaman.com\n")
 VERBATIM = "Umm, so, uh, I- I mean, like, you know, I was, uh, thinking... Um, okay."
 
